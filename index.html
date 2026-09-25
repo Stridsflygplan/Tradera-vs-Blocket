@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="sv" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tradera vs Blocket - Avgiftsjämförelse</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- FontAwesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            tradera: {
+              DEFAULT: '#fbbf24',
+              dark: '#d97706',
+              bg: '#1e180d',
+              border: '#78350f'
+            },
+            blocket: {
+              DEFAULT: '#38bdf8',
+              dark: '#0284c7',
+              bg: '#0c1e38',
+              border: '#0369a1'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 24px;
+      width: 24px;
+      border-radius: 50%;
+      background: #38bdf8;
+      cursor: pointer;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+      border: 2px solid #ffffff;
+    }
+  </style>
+</head>
+<body class="font-sans antialiased min-h-full flex flex-col justify-between bg-slate-950 text-slate-100 selection:bg-sky-500 selection:text-white">
+
+  <header class="border-b border-slate-800/80 bg-slate-900/90 backdrop-blur sticky top-0 z-50 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-gradient-to-tr from-amber-500 via-sky-500 to-emerald-500 rounded-xl text-slate-950 font-black text-xl shadow-lg">
+          <i class="fa-solid fa-scale-balanced"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-black bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+            Tradera vs Blocket
+          </h1>
+          <p class="text-xs text-slate-400">Avgiftsjämförelse från 10 kr till 10 000 kr</p>
+        </div>
+      </div>
+      
+      <!-- Perspective Selector Tabs -->
+      <div class="bg-slate-950 p-1.5 rounded-xl border border-slate-800 flex items-center gap-1 w-full sm:w-auto shadow-inner">
+        <button id="modeSellerBtn" class="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 bg-emerald-500 text-slate-950 shadow-md">
+          <i class="fa-solid fa-store"></i> Säljarperspektiv (Önskad Vinst)
+        </button>
+        <button id="modeBuyerBtn" class="flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800">
+          <i class="fa-solid fa-cart-shopping"></i> Köparperspektiv (Samma Listpris)
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow space-y-8 w-full">
+    
+    <section class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
+      <div class="absolute -top-24 -right-24 w-80 h-80 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -left-24 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+        
+        <!-- Input & Slider -->
+        <div class="lg:col-span-7 space-y-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <label id="inputMainLabel" for="amountInput" class="text-base font-bold text-slate-100 flex items-center gap-2">
+              <i id="inputIcon" class="fa-solid fa-coins text-amber-400"></i> Önskad vinst till säljaren
+            </label>
+            <span id="inputSubLabel" class="text-xs text-slate-400">Säljaren ska få detta belopp i fickan</span>
+          </div>
+
+          <!-- Currency Input -->
+          <div class="relative flex items-center">
+            <input 
+              type="number" 
+              id="amountInput" 
+              value="500" 
+              min="10" 
+              max="10000" 
+              step="10"
+              class="w-full bg-slate-950 border-2 border-slate-700 focus:border-sky-500 rounded-xl px-4 py-3.5 text-3xl font-black text-white focus:outline-none transition-all pr-20 shadow-inner tracking-tight"
+            >
+            <span class="absolute right-4 text-slate-400 font-extrabold text-xl pointer-events-none">kr</span>
+          </div>
+
+          <!-- Range Slider -->
+          <div class="space-y-2 pt-2">
+            <input 
+              type="range" 
+              id="amountSlider" 
+              min="10" 
+              max="10000" 
+              value="500" 
+              step="10"
+              class="w-full h-2.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-sky-400"
+            >
+            <div class="flex justify-between text-[11px] text-slate-400 font-semibold px-1">
+              <span>10 kr</span>
+              <span>2 500 kr</span>
+              <span>5 000 kr</span>
+              <span>7 500 kr</span>
+              <span>10 000 kr</span>
+            </div>
+          </div>
+
+          <!-- Presets -->
+          <div class="space-y-2 pt-1">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Snabbval för belopp:</span>
+            <div class="flex flex-wrap gap-2" id="presetButtons">
+              <button data-val="100" class="preset-btn px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold transition-all">100 kr</button>
+              <button data-val="500" class="preset-btn px-3 py-1.5 bg-sky-500/20 border border-sky-500 text-sky-300 rounded-lg text-xs font-semibold transition-all">500 kr</button>
+              <button data-val="1000" class="preset-btn px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold transition-all">1 000 kr</button>
+              <button data-val="2500" class="preset-btn px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold transition-all">2 500 kr</button>
+              <button data-val="5000" class="preset-btn px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold transition-all">5 000 kr</button>
+              <button data-val="7500" class="preset-btn px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold transition-all">7 500 kr</button>
+              <button data-val="10000" class="preset-btn px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold transition-all">10 000 kr</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rules & Conditions -->
+        <div class="lg:col-span-5 bg-slate-950/80 border border-slate-800 rounded-xl p-5 space-y-4 shadow-inner">
+          <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2 border-b border-slate-800 pb-2">
+            <i class="fa-solid fa-sliders text-amber-400"></i> Aktiva Villkor & Regler
+          </h3>
+
+          <div class="flex items-start justify-between gap-4">
+            <div class="space-y-1">
+              <label for="traderaProtToggle" class="text-xs font-bold text-slate-200 cursor-pointer flex items-center gap-1.5">
+                Tradera Köparskydd vid varupris ≤ 200 kr
+              </label>
+              <p class="text-[11px] text-slate-400 leading-relaxed">
+                Köparskydd (2 kr + 5%) kan väljas bort på Tradera när varans listpris är max 200 kr.
+              </p>
+            </div>
+            
+            <label class="relative inline-flex items-center cursor-pointer mt-1 flex-shrink-0">
+              <input type="checkbox" id="traderaProtToggle" class="sr-only peer" checked>
+              <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+            </label>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-400 pt-2 border-t border-slate-800">
+            <div class="bg-slate-900/90 p-2.5 rounded border border-slate-800 space-y-0.5">
+              <span class="font-bold text-amber-400 block">Tradera</span>
+              <div>Frakt: <strong>49 kr</strong> (Instabox)</div>
+              <div>Säljaravgift: <strong>10% (max 200kr)</strong></div>
+              <div>Köparskydd: <strong>2 kr + 5%</strong></div>
+            </div>
+            <div class="bg-slate-900/90 p-2.5 rounded border border-slate-800 space-y-0.5">
+              <span class="font-bold text-sky-400 block">Blocket</span>
+              <div>Frakt: <strong>39 kr</strong> (Blocket Paket)</div>
+              <div>Säljaravgift: <strong>0 kr</strong></div>
+              <div>Köpskydd: <strong>Trappa (Se nedan)</strong></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="winnerBanner" class="p-6 rounded-2xl border transition-all duration-300 shadow-2xl relative overflow-hidden">
+      <!-- Dynamic JS Content -->
+    </section>
+
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- TRADERA CARD -->
+      <div class="bg-gradient-to-b from-slate-900 to-amber-950/20 border border-amber-500/30 rounded-2xl p-6 shadow-xl relative flex flex-col justify-between">
+        <div>
+          <div class="flex justify-between items-start mb-6">
+            <div>
+              <span class="inline-block px-2.5 py-1 bg-amber-500/20 text-amber-400 text-xs font-bold rounded mb-2">
+                Auktion & Fast pris
+              </span>
+              <h2 class="text-2xl font-black text-amber-400 flex items-center gap-2">
+                Tradera
+              </h2>
+            </div>
+            <div class="text-right">
+              <span class="text-xs text-slate-400 block">Köparens Totalkostnad</span>
+              <span id="traderaBuyerTotal" class="text-2xl font-black text-white">0 kr</span>
+            </div>
+          </div>
+
+          <!-- Cost Table Tradera -->
+          <div class="space-y-3 text-sm border-t border-amber-500/20 pt-4">
+            <div class="flex justify-between items-center">
+              <span class="text-slate-300 flex items-center gap-1.5 font-medium">
+                <i class="fa-solid fa-tag text-amber-400 text-xs"></i> Annonsens Listpris
+              </span>
+              <span id="traderaListPrice" class="font-bold text-white">0 kr</span>
+            </div>
+
+            <div id="traderaSellerFeeRow" class="flex justify-between items-center text-rose-300 text-xs bg-rose-950/30 p-2.5 rounded border border-rose-900/40">
+              <span class="flex items-center gap-1.5">
+                <i class="fa-solid fa-minus-circle"></i> Säljaravgift (10%, max 200 kr)
+              </span>
+              <span id="traderaSellerFee" class="font-bold">-0 kr</span>
+            </div>
+
+            <div class="flex justify-between items-center text-emerald-400 font-medium text-xs bg-emerald-950/20 p-2.5 rounded border border-emerald-900/30">
+              <span class="flex items-center gap-1.5">
+                <i class="fa-solid fa-coins"></i> Säljarens vinst i fickan
+              </span>
+              <span id="traderaNetProfit" class="font-bold">0 kr</span>
+            </div>
+
+            <div class="flex justify-between items-center pt-2">
+              <span class="text-slate-300">
+                <i class="fa-solid fa-truck text-xs text-slate-400 mr-1.5"></i> Frakt (Instabox)
+              </span>
+              <span id="traderaShipping" class="font-medium text-slate-200">49 kr</span>
+            </div>
+
+            <div class="flex justify-between items-center">
+              <span class="text-slate-300 flex items-center gap-1">
+                <i class="fa-solid fa-shield-halved text-xs text-amber-400 mr-1"></i> Köparskydd (2 kr + 5%)
+                <span id="traderaProtBadge" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">Valfritt ≤200kr</span>
+              </span>
+              <span id="traderaBuyerProt" class="font-medium text-slate-200">0 kr</span>
+            </div>
+
+            <div class="flex justify-between items-center pt-2 border-t border-slate-800 font-semibold text-xs text-amber-300">
+              <span id="traderaTotalFeesLabel">Totala extra avgifter + frakt:</span>
+              <span id="traderaTotalFees">0 kr</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-amber-500/20 text-xs text-slate-400">
+          <p id="traderaNote">*I säljarläget höjs listpriset på Tradera för att täcka säljarprovisionen.</p>
+        </div>
+      </div>
+
+      <!-- BLOCKET CARD -->
+      <div class="bg-gradient-to-b from-slate-900 to-sky-950/20 border border-sky-500/30 rounded-2xl p-6 shadow-xl relative flex flex-col justify-between">
+        <div>
+          <div class="flex justify-between items-start mb-6">
+            <div>
+              <span class="inline-block px-2.5 py-1 bg-sky-500/20 text-sky-400 text-xs font-bold rounded mb-2">
+                Köpskydd & Paket
+              </span>
+              <h2 class="text-2xl font-black text-sky-400 flex items-center gap-2">
+                Blocket
+              </h2>
+            </div>
+            <div class="text-right">
+              <span class="text-xs text-slate-400 block">Köparens Totalkostnad</span>
+              <span id="blocketBuyerTotal" class="text-2xl font-black text-white">0 kr</span>
+            </div>
+          </div>
+
+          <!-- Cost Table Blocket -->
+          <div class="space-y-3 text-sm border-t border-sky-500/20 pt-4">
+            <div class="flex justify-between items-center">
+              <span class="text-slate-300 flex items-center gap-1.5 font-medium">
+                <i class="fa-solid fa-tag text-sky-400 text-xs"></i> Annonsens Listpris
+              </span>
+              <span id="blocketListPrice" class="font-bold text-white">0 kr</span>
+            </div>
+
+            <div class="flex justify-between items-center text-slate-400 text-xs bg-slate-950/50 p-2.5 rounded border border-slate-800">
+              <span class="flex items-center gap-1.5">
+                <i class="fa-solid fa-circle-info text-sky-400"></i> Säljaravgift (Privatperson)
+              </span>
+              <span id="blocketSellerFee" class="font-bold text-emerald-400">0 kr</span>
+            </div>
+
+            <div class="flex justify-between items-center text-emerald-400 font-medium text-xs bg-emerald-950/20 p-2.5 rounded border border-emerald-900/30">
+              <span class="flex items-center gap-1.5">
+                <i class="fa-solid fa-coins"></i> Säljarens vinst i fickan
+              </span>
+              <span id="blocketNetProfit" class="font-bold">0 kr</span>
+            </div>
+
+            <div class="flex justify-between items-center pt-2">
+              <span class="text-slate-300">
+                <i class="fa-solid fa-truck text-xs text-slate-400 mr-1.5"></i> Frakt (Blocket Paket)
+              </span>
+              <span id="blocketShipping" class="font-medium text-slate-200">39 kr</span>
+            </div>
+
+            <div class="flex justify-between items-center">
+              <span class="text-slate-300 flex items-center gap-1">
+                <i class="fa-solid fa-shield-halved text-xs text-sky-400 mr-1"></i> Köpskydd (Trappa)
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">Obligatoriskt</span>
+              </span>
+              <span id="blocketBuyerProt" class="font-medium text-sky-300 font-bold">0 kr</span>
+            </div>
+
+            <div class="flex justify-between items-center pt-2 border-t border-slate-800 font-semibold text-xs text-sky-300">
+              <span id="blocketTotalFeesLabel">Totala extra avgifter + frakt:</span>
+              <span id="blocketTotalFees">0 kr</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-sky-500/20 text-xs text-slate-400">
+          <p>*Blocket har 0 kr i säljaravgift. Köpskyddet räknas ut enligt den nya trappstegsmodellen.</p>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+      <h3 class="text-lg font-bold text-white flex items-center gap-2">
+        <i class="fa-solid fa-shield-halved text-sky-400"></i> Hur fungerar Blockets nya köpskydd?
+      </h3>
+      <p class="text-xs text-slate-400 leading-relaxed">
+        Blockets köpskydd beräknas stegvis beroende på varans utannonserade pris:
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-1">
+          <span class="font-bold text-sky-400 block">Nivå 1: Upp till 40 kr</span>
+          <p class="text-slate-300 font-semibold">Fast avgift: 28 kr</p>
+          <p class="text-slate-500 text-[11px]">Gäller för billiga småsaker.</p>
+        </div>
+
+        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-1">
+          <span class="font-bold text-sky-400 block">Nivå 2: 41 kr – 2 000 kr</span>
+          <p class="text-slate-300 font-semibold">28 kr + 5,625% på del över 40 kr</p>
+          <p class="text-slate-500 text-[11px]">Procentuell ökning för medelstora köp.</p>
+        </div>
+
+        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-1">
+          <span class="font-bold text-sky-400 block">Nivå 3: 2 001 kr – 3 000 kr</span>
+          <p class="text-slate-300 font-semibold">138 kr + 4,3% på del över 2 000 kr</p>
+          <p class="text-slate-500 text-[11px]">Lägre procentsats för dyrare varor.</p>
+        </div>
+
+        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-1">
+          <span class="font-bold text-sky-400 block">Nivå 4: Över 3 000 kr</span>
+          <p class="text-slate-300 font-semibold">181 kr + 0,5% på del över 3 000 kr</p>
+          <p class="text-slate-500 text-[11px]">Mycket låg ökning för t.ex. elektronik.</p>
+        </div>
+      </div>
+
+      <div id="explanationContainer" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm pt-2">
+        <!-- Dynamic bullet points via JS -->
+      </div>
+    </section>
+
+    <section class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+        <div>
+          <h3 id="chartTitle" class="text-lg font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-chart-line text-sky-400"></i> Kostnadskurva från 10 kr till 10 000 kr
+          </h3>
+          <p id="chartSubTitle" class="text-xs text-slate-400">Visar hur köparens totalkostnad förändras med beloppet.</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- View Range Toggle Buttons -->
+          <div class="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center gap-1 text-xs font-semibold">
+            <button id="chartView1k" class="px-3 py-1 rounded-lg bg-slate-800 text-slate-200 transition-all">Detaljvy (10 - 1 000 kr)</button>
+            <button id="chartView10k" class="px-3 py-1 rounded-lg bg-sky-500 text-slate-950 font-bold transition-all">Full Vy (10 - 10 000 kr)</button>
+          </div>
+
+          <!-- Legend -->
+          <div class="flex items-center gap-3 text-xs font-semibold pl-2 border-l border-slate-800">
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span> Tradera
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 rounded-full bg-sky-400 inline-block"></span> Blocket
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart Canvas Container -->
+      <div class="relative w-full h-80 sm:h-96">
+        <canvas id="comparisonChart"></canvas>
+      </div>
+    </section>
+
+    <section class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+      <div>
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-table-list text-emerald-400"></i> Referenstabell (Standardbelopp)
+        </h3>
+        <p class="text-xs text-slate-400">Snabbjämförelse över vanliga prissegment för det valda perspektivet.</p>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="text-xs uppercase bg-slate-950 text-slate-400 border-b border-slate-800">
+            <tr>
+              <th id="thAmountLabel" scope="col" class="px-4 py-3">Belopp</th>
+              <th scope="col" class="px-4 py-3">Tradera Listpris</th>
+              <th scope="col" class="px-4 py-3">Tradera Totalt</th>
+              <th scope="col" class="px-4 py-3">Blocket Listpris</th>
+              <th scope="col" class="px-4 py-3">Blocket Totalt</th>
+              <th scope="col" class="px-4 py-3">Billigast</th>
+              <th scope="col" class="px-4 py-3">Skillnad</th>
+            </tr>
+          </thead>
+          <tbody id="breakEvenTableBody" class="divide-y divide-slate-800/60">
+            <!-- Table rows populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800 bg-slate-950 py-6 mt-12 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 space-y-1">
+      <p>Beräkningar baserade på gällande avgifter: Tradera (Instabox 49 kr, 10% provision max 200 kr, köparskydd 2 kr + 5%), Blocket Paket (39 kr frakt, köpskydd enligt trappstegsmodellen).</p>
+      <p>© 2026 Avgiftskalkylator. Inofficiellt jämförelseverktyg för svensk begagnatmarknad.</p>
+    </div>
+  </footer>
+
+  <script>
+
+    // EXACT FUNCTION PROVIDED BY USER FOR BLOCKET BUYER PROTECTION
+    function beraknaKopskydd(pris) {
+      if (pris <= 40) {
+        return 28;
+      } else if (pris <= 2000) {
+        return Math.round(28 + (pris - 40) * 0.05625);
+      } else if (pris <= 3000) {
+        return Math.round(138 + (pris - 2000) * 0.043);
+      } else {
+        return Math.round(181 + (pris - 3000) * 0.005);
+      }
+    }
+
+    // Helper to format SEK currency
+    function formatSEK(num) {
+      return num.toLocaleString('sv-SE', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }) + ' kr';
+    }
+
+    function formatSEKShort(num) {
+      return Math.round(num).toLocaleString('sv-SE') + ' kr';
+    }
+
+    // Active Mode: 'seller' or 'buyer'
+    let activeMode = 'seller';
+
+    /*
+     * CALCULATION LOGIC
+     * mode = 'seller' -> input is Desired Net Profit P
+     * mode = 'buyer'  -> input is Item List Price L (identical on both platforms)
+     */
+    function calculateFees(amount, includeTraderaProtUnder200, mode = activeMode) {
+      if (mode === 'seller') {
+        // SELLER MODE
+        const profit = amount;
+
+        // Tradera: Seller Fee = 10% (min 3, max 200)
+        let traderaListPrice = 0;
+        let traderaSellerFee = 0;
+
+        if (profit < 27) {
+          traderaSellerFee = 3;
+          traderaListPrice = profit + 3;
+        } else if (profit <= 1800) {
+          traderaListPrice = profit / 0.90;
+          traderaSellerFee = traderaListPrice * 0.10;
+        } else {
+          traderaSellerFee = 200;
+          traderaListPrice = profit + 200;
+        }
+
+        const traderaShipping = 49;
+        const isTraderaUnder200 = traderaListPrice <= 200;
+        let traderaBuyerProt = 0;
+
+        if (isTraderaUnder200 && !includeTraderaProtUnder200) {
+          traderaBuyerProt = 0;
+        } else {
+          traderaBuyerProt = 2 + (traderaListPrice * 0.05);
+        }
+
+        const traderaBuyerTotal = traderaListPrice + traderaShipping + traderaBuyerProt;
+        const traderaTotalFees = traderaBuyerTotal - profit;
+
+        // Blocket: 0 kr Seller Fee
+        const blocketListPrice = profit;
+        const blocketSellerFee = 0;
+        const blocketShipping = 39;
+        const blocketBuyerProt = beraknaKopskydd(blocketListPrice);
+        const blocketBuyerTotal = blocketListPrice + blocketShipping + blocketBuyerProt;
+        const blocketTotalFees = blocketBuyerTotal - profit;
+
+        const diff = Math.abs(traderaBuyerTotal - blocketBuyerTotal);
+        let winner = 'equal';
+        if (traderaBuyerTotal < blocketBuyerTotal - 0.01) winner = 'tradera';
+        else if (blocketBuyerTotal < traderaBuyerTotal - 0.01) winner = 'blocket';
+
+        return {
+          amount,
+          mode,
+          tradera: {
+            listPrice: traderaListPrice,
+            sellerFee: traderaSellerFee,
+            netProfit: profit,
+            shipping: traderaShipping,
+            buyerProt: traderaBuyerProt,
+            buyerTotal: traderaBuyerTotal,
+            totalFees: traderaTotalFees,
+            isUnder200: isTraderaUnder200
+          },
+          blocket: {
+            listPrice: blocketListPrice,
+            sellerFee: blocketSellerFee,
+            netProfit: profit,
+            shipping: blocketShipping,
+            buyerProt: blocketBuyerProt,
+            buyerTotal: blocketBuyerTotal,
+            totalFees: blocketTotalFees
+          },
+          winner,
+          diff
+        };
+
+      } else {
+        // BUYER MODE
+        // input is Product List Price P on both platforms
+        const listPrice = amount;
+
+        // Tradera
+        const traderaListPrice = listPrice;
+        let traderaSellerFee = 0;
+        if (listPrice * 0.10 < 3) traderaSellerFee = 3;
+        else if (listPrice * 0.10 > 200) traderaSellerFee = 200;
+        else traderaSellerFee = listPrice * 0.10;
+
+        const traderaNetProfit = listPrice - traderaSellerFee;
+        const traderaShipping = 49;
+        const isTraderaUnder200 = listPrice <= 200;
+        let traderaBuyerProt = 0;
+
+        if (isTraderaUnder200 && !includeTraderaProtUnder200) {
+          traderaBuyerProt = 0;
+        } else {
+          traderaBuyerProt = 2 + (listPrice * 0.05);
+        }
+
+        const traderaBuyerTotal = listPrice + traderaShipping + traderaBuyerProt;
+        const traderaTotalFees = traderaShipping + traderaBuyerProt; // Only buyer extra fees
+
+        // Blocket
+        const blocketListPrice = listPrice;
+        const blocketSellerFee = 0;
+        const blocketNetProfit = listPrice;
+        const blocketShipping = 39;
+        const blocketBuyerProt = beraknaKopskydd(blocketListPrice);
+        const blocketBuyerTotal = listPrice + blocketShipping + blocketBuyerProt;
+        const blocketTotalFees = blocketShipping + blocketBuyerProt; // Only buyer extra fees
+
+        const diff = Math.abs(traderaBuyerTotal - blocketBuyerTotal);
+        let winner = 'equal';
+        if (traderaBuyerTotal < blocketBuyerTotal - 0.01) winner = 'tradera';
+        else if (blocketBuyerTotal < traderaBuyerTotal - 0.01) winner = 'blocket';
+
+        return {
+          amount,
+          mode,
+          tradera: {
+            listPrice: traderaListPrice,
+            sellerFee: traderaSellerFee,
+            netProfit: traderaNetProfit,
+            shipping: traderaShipping,
+            buyerProt: traderaBuyerProt,
+            buyerTotal: traderaBuyerTotal,
+            totalFees: traderaTotalFees,
+            isUnder200: isTraderaUnder200
+          },
+          blocket: {
+            listPrice: blocketListPrice,
+            sellerFee: blocketSellerFee,
+            netProfit: blocketNetProfit,
+            shipping: blocketShipping,
+            buyerProt: blocketBuyerProt,
+            buyerTotal: blocketBuyerTotal,
+            totalFees: blocketTotalFees
+          },
+          winner,
+          diff
+        };
+      }
+    }
+
+    // DOM Elements
+    const modeSellerBtn = document.getElementById('modeSellerBtn');
+    const modeBuyerBtn = document.getElementById('modeBuyerBtn');
+    
+    const inputMainLabel = document.getElementById('inputMainLabel');
+    const inputSubLabel = document.getElementById('inputSubLabel');
+
+    const amountInput = document.getElementById('amountInput');
+    const amountSlider = document.getElementById('amountSlider');
+    const traderaProtToggle = document.getElementById('traderaProtToggle');
+    const presetButtons = document.querySelectorAll('.preset-btn');
+    
+    const winnerBanner = document.getElementById('winnerBanner');
+    
+    // Tradera DOM
+    const traderaBuyerTotal = document.getElementById('traderaBuyerTotal');
+    const traderaListPrice = document.getElementById('traderaListPrice');
+    const traderaSellerFeeRow = document.getElementById('traderaSellerFeeRow');
+    const traderaSellerFee = document.getElementById('traderaSellerFee');
+    const traderaNetProfit = document.getElementById('traderaNetProfit');
+    const traderaShipping = document.getElementById('traderaShipping');
+    const traderaBuyerProt = document.getElementById('traderaBuyerProt');
+    const traderaTotalFeesLabel = document.getElementById('traderaTotalFeesLabel');
+    const traderaTotalFees = document.getElementById('traderaTotalFees');
+    const traderaProtBadge = document.getElementById('traderaProtBadge');
+    const traderaNote = document.getElementById('traderaNote');
+
+    // Blocket DOM
+    const blocketBuyerTotal = document.getElementById('blocketBuyerTotal');
+    const blocketListPrice = document.getElementById('blocketListPrice');
+    const blocketSellerFee = document.getElementById('blocketSellerFee');
+    const blocketNetProfit = document.getElementById('blocketNetProfit');
+    const blocketShipping = document.getElementById('blocketShipping');
+    const blocketBuyerProt = document.getElementById('blocketBuyerProt');
+    const blocketTotalFeesLabel = document.getElementById('blocketTotalFeesLabel');
+    const blocketTotalFees = document.getElementById('blocketTotalFees');
+
+    const explanationContainer = document.getElementById('explanationContainer');
+    const breakEvenTableBody = document.getElementById('breakEvenTableBody');
+    const thAmountLabel = document.getElementById('thAmountLabel');
+
+    const chartTitle = document.getElementById('chartTitle');
+    const chartSubTitle = document.getElementById('chartSubTitle');
+    const chartView1k = document.getElementById('chartView1k');
+    const chartView10k = document.getElementById('chartView10k');
+
+    let chartInstance = null;
+    let chartMaxLimit = 10000;
+
+    function updateUI() {
+      let amount = parseFloat(amountInput.value) || 10;
+      if (amount < 10) amount = 10;
+      if (amount > 10000) amount = 10000;
+
+      const includeProt = traderaProtToggle.checked;
+      const res = calculateFees(amount, includeProt, activeMode);
+
+      // Mode-specific UI adaptations
+      if (activeMode === 'seller') {
+        inputMainLabel.innerHTML = `<i class="fa-solid fa-coins text-amber-400"></i> Önskad vinst till säljaren`;
+        inputSubLabel.innerText = `Säljaren ska få detta nettobelopp i fickan`;
+        thAmountLabel.innerText = `Önskad Vinst`;
+
+        traderaTotalFeesLabel.innerText = `Totala extra avgifter + frakt:`;
+        blocketTotalFeesLabel.innerText = `Totala extra avgifter + frakt:`;
+        
+        traderaSellerFeeRow.className = `flex justify-between items-center text-rose-300 text-xs bg-rose-950/30 p-2.5 rounded border border-rose-900/40`;
+        traderaSellerFee.innerText = '-' + formatSEK(res.tradera.sellerFee);
+        traderaNote.innerText = `*I säljarläget höjs listpriset på Tradera för att täcka säljarprovisionen så att du får din önskade vinst opåverkad.`;
+
+        chartTitle.innerHTML = `<i class="fa-solid fa-chart-line text-sky-400"></i> Kostnadskurva Säljare (10 kr - 10 000 kr)`;
+        chartSubTitle.innerText = `Visar köparens slutpris när säljarens vinst är den samma.`;
+
+      } else {
+        inputMainLabel.innerHTML = `<i class="fa-solid fa-tag text-sky-400"></i> Produktens pris / Listpris`;
+        inputSubLabel.innerText = `Varans utannonserade pris (samma pris på båda sidor)`;
+        thAmountLabel.innerText = `Produktpris`;
+
+        traderaTotalFeesLabel.innerText = `Köparens extra tillägg (frakt + skydd):`;
+        blocketTotalFeesLabel.innerText = `Köparens extra tillägg (frakt + skydd):`;
+
+        traderaSellerFeeRow.className = `flex justify-between items-center text-slate-400 text-xs bg-slate-950/50 p-2.5 rounded border border-slate-800`;
+        traderaSellerFee.innerText = `${formatSEK(res.tradera.sellerFee)} (Dras från säljaren)`;
+        traderaNote.innerText = `*I köparläget antar vi att produkten kostar samma i båda annonserna. Säljaravgiften påverkar då inte köparens pris.`;
+
+        chartTitle.innerHTML = `<i class="fa-solid fa-chart-line text-sky-400"></i> Kostnadskurva Köpare (10 kr - 10 000 kr)`;
+        chartSubTitle.innerText = `Visar köparens slutpris vid identiskt annonspris på båda sidor.`;
+      }
+
+      // Update Tradera Card
+      traderaBuyerTotal.innerText = formatSEK(res.tradera.buyerTotal);
+      traderaListPrice.innerText = formatSEK(res.tradera.listPrice);
+      traderaNetProfit.innerText = formatSEK(res.tradera.netProfit);
+      traderaShipping.innerText = formatSEK(res.tradera.shipping);
+      traderaBuyerProt.innerText = formatSEK(res.tradera.buyerProt);
+      traderaTotalFees.innerText = formatSEK(res.tradera.totalFees);
+
+      if (res.tradera.isUnder200) {
+        traderaProtBadge.style.display = 'inline-block';
+        traderaProtBadge.innerText = includeProt ? 'Aktiverat' : 'Avstängt';
+        traderaProtBadge.className = includeProt 
+          ? 'text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-semibold' 
+          : 'text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400';
+      } else {
+        traderaProtBadge.style.display = 'inline-block';
+        traderaProtBadge.innerText = 'Obligatoriskt (>200kr)';
+        traderaProtBadge.className = 'text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400';
+      }
+
+      // Update Blocket Card
+      blocketBuyerTotal.innerText = formatSEK(res.blocket.buyerTotal);
+      blocketListPrice.innerText = formatSEK(res.blocket.listPrice);
+      blocketSellerFee.innerText = '0,00 kr';
+      blocketNetProfit.innerText = formatSEK(res.blocket.netProfit);
+      blocketShipping.innerText = formatSEK(res.blocket.shipping);
+      blocketBuyerProt.innerText = formatSEK(res.blocket.buyerProt);
+      blocketTotalFees.innerText = formatSEK(res.blocket.totalFees);
+
+      // Update Winner Hero Banner
+      if (res.winner === 'blocket') {
+        winnerBanner.className = 'p-6 rounded-2xl border border-sky-500/50 bg-gradient-to-r from-sky-950/90 via-slate-900 to-slate-900 shadow-2xl relative overflow-hidden';
+        winnerBanner.innerHTML = `
+          <div class="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+            <div class="flex items-center gap-4">
+              <div class="w-14 h-14 rounded-2xl bg-sky-500 flex items-center justify-center text-slate-950 font-extrabold text-2xl shadow-lg shadow-sky-500/30">
+                <i class="fa-solid fa-trophy"></i>
+              </div>
+              <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-sky-400">Bästa alternativet för köparen</span>
+                <h2 class="text-3xl font-black text-white">Blocket vinner med ${formatSEK(res.diff)}</h2>
+                <p class="text-xs text-slate-300 mt-1">
+                  Totalkostnad för köparen blir <strong class="text-sky-300">${formatSEK(res.blocket.buyerTotal)}</strong> på Blocket jämfört med <strong class="text-amber-300">${formatSEK(res.tradera.buyerTotal)}</strong> på Tradera.
+                </p>
+              </div>
+            </div>
+            <div class="bg-slate-950/80 border border-sky-500/30 px-6 py-3 rounded-xl text-center md:text-right w-full md:w-auto">
+              <span class="text-xs text-slate-400 block">${activeMode === 'seller' ? 'Säljarens nettovinst:' : 'Produktens listpris:'}</span>
+              <span class="text-xl font-extrabold text-emerald-400">${formatSEK(res.amount)}</span>
+            </div>
+          </div>
+        `;
+      } else if (res.winner === 'tradera') {
+        winnerBanner.className = 'p-6 rounded-2xl border border-amber-500/50 bg-gradient-to-r from-amber-950/90 via-slate-900 to-slate-900 shadow-2xl relative overflow-hidden';
+        winnerBanner.innerHTML = `
+          <div class="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+            <div class="flex items-center gap-4">
+              <div class="w-14 h-14 rounded-2xl bg-amber-500 flex items-center justify-center text-slate-950 font-extrabold text-2xl shadow-lg shadow-amber-500/30">
+                <i class="fa-solid fa-trophy"></i>
+              </div>
+              <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Bästa alternativet för köparen</span>
+                <h2 class="text-3xl font-black text-white">Tradera vinner med ${formatSEK(res.diff)}</h2>
+                <p class="text-xs text-slate-300 mt-1">
+                  Totalkostnad för köparen blir <strong class="text-amber-300">${formatSEK(res.tradera.buyerTotal)}</strong> på Tradera jämfört med <strong class="text-sky-300">${formatSEK(res.blocket.buyerTotal)}</strong> på Blocket.
+                </p>
+              </div>
+            </div>
+            <div class="bg-slate-950/80 border border-amber-500/30 px-6 py-3 rounded-xl text-center md:text-right w-full md:w-auto">
+              <span class="text-xs text-slate-400 block">${activeMode === 'seller' ? 'Säljarens nettovinst:' : 'Produktens listpris:'}</span>
+              <span class="text-xl font-extrabold text-emerald-400">${formatSEK(res.amount)}</span>
+            </div>
+          </div>
+        `;
+      } else {
+        winnerBanner.className = 'p-6 rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl';
+        winnerBanner.innerHTML = `
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center text-slate-300 font-bold text-xl">
+              <i class="fa-solid fa-equals"></i>
+            </div>
+            <div>
+              <h2 class="text-2xl font-bold text-white">Exakt lika dyrt för köparen!</h2>
+              <p class="text-xs text-slate-400">Båda plattformar resulterar i en totalkostnad på ${formatSEK(res.blocket.buyerTotal)}.</p>
+            </div>
+          </div>
+        `;
+      }
+
+      // Update Explanations
+      renderExplanations(res);
+
+      // Update Chart
+      updateChart(includeProt);
+
+      // Highlight preset button
+      presetButtons.forEach(btn => {
+        if (parseFloat(btn.dataset.val) === amount) {
+          btn.className = 'preset-btn px-3 py-1.5 bg-sky-500/20 border border-sky-500 text-sky-300 rounded-lg text-xs font-semibold transition-all shadow-sm';
+        } else {
+          btn.className = 'preset-btn px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold transition-all';
+        }
+      });
+    }
+
+    function renderExplanations(res) {
+      if (res.mode === 'seller') {
+        explanationContainer.innerHTML = `
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1.5">
+            <span class="text-xs font-bold text-amber-400 uppercase tracking-wider block">1. Tradera säljarprovision</span>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              ${res.amount > 1800 
+                ? `Vid höga vinster över 1 800 kr slår Traderas maxtak på <strong>200 kr</strong> in. Annonspriset blir då din vinst + 200 kr.` 
+                : `För att få kvar ${formatSEKShort(res.amount)} höjs Tradera-annonsen till <strong>${formatSEK(res.tradera.listPrice)}</strong> för att täcka 10% säljarprovision.`}
+            </p>
+          </div>
+
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1.5">
+            <span class="text-xs font-bold text-sky-400 uppercase tracking-wider block">2. Blockets köpskyddstrappa</span>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Blockets köpskydd för ${formatSEKShort(res.blocket.listPrice)} blir <strong>${formatSEK(res.blocket.buyerProt)}</strong> enligt den nya trappstegsmodellen.
+            </p>
+          </div>
+
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1.5">
+            <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider block">3. Varför vinnaren sparar pengar</span>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              ${res.winner === 'blocket' 
+                ? `Blocket vinner för att 0 kr säljaravgift håller listpriset lägre, vilket kompenserar för köpskyddet.` 
+                : `Tradera vinner i detta prissegment tack vare lägre köparskydd eller billigare totalkombination.`}
+            </p>
+          </div>
+        `;
+      } else {
+        explanationContainer.innerHTML = `
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1.5">
+            <span class="text-xs font-bold text-amber-400 uppercase tracking-wider block">1. Tradera köparskydd</span>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Traderas köparskydd är <strong>2 kr + 5%</strong> (${formatSEK(res.tradera.buyerProt)}).
+            </p>
+          </div>
+
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1.5">
+            <span class="text-xs font-bold text-sky-400 uppercase tracking-wider block">2. Blocket köpskydd</span>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Blockets köpskydd för ${formatSEKShort(res.blocket.listPrice)} blir <strong>${formatSEK(res.blocket.buyerProt)}</strong> enligt trappstegsmodellen.
+            </p>
+          </div>
+
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1.5">
+            <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider block">3. Fraktskillnaden</span>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Blockets frakt (39 kr) är 10 kr billigare än Traderas Instabox (49 kr).
+            </p>
+          </div>
+        `;
+      }
+    }
+
+    function initChart() {
+      const ctx = document.getElementById('comparisonChart').getContext('2d');
+
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: 'Tradera (Köparens Totalkostnad)',
+              data: [],
+              borderColor: '#fbbf24',
+              backgroundColor: 'rgba(251, 191, 36, 0.08)',
+              borderWidth: 3,
+              tension: 0.1,
+              pointRadius: 0,
+              pointHoverRadius: 6,
+              fill: true
+            },
+            {
+              label: 'Blocket (Köparens Totalkostnad)',
+              data: [],
+              borderColor: '#38bdf8',
+              backgroundColor: 'rgba(56, 189, 248, 0.08)',
+              borderWidth: 3,
+              tension: 0.1,
+              pointRadius: 0,
+              pointHoverRadius: 6,
+              fill: true
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              backgroundColor: '#0f172a',
+              titleColor: '#f8fafc',
+              bodyColor: '#cbd5e1',
+              borderColor: '#334155',
+              borderWidth: 1,
+              padding: 12,
+              callbacks: {
+                title: function(context) {
+                  return (activeMode === 'seller' ? 'Önskad vinst: ' : 'Listpris: ') + context[0].label + ' kr';
+                },
+                label: function(context) {
+                  return context.dataset.label + ': ' + formatSEK(context.raw);
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: {
+                color: '#1e293b'
+              },
+              ticks: {
+                color: '#64748b',
+                maxTicksLimit: 12,
+                callback: function(val) {
+                  return this.getLabelForValue(val) + ' kr';
+                }
+              }
+            },
+            y: {
+              grid: {
+                color: '#1e293b'
+              },
+              ticks: {
+                color: '#64748b',
+                callback: function(val) {
+                  return val + ' kr';
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateChart(includeProt) {
+      if (!chartInstance) return;
+
+      const labels = [];
+      const traderaData = [];
+      const blocketData = [];
+
+      const step = chartMaxLimit <= 1000 ? 20 : 100;
+
+      for (let p = 10; p <= chartMaxLimit; p += step) {
+        labels.push(p);
+        const r = calculateFees(p, includeProt, activeMode);
+        traderaData.push(r.tradera.buyerTotal);
+        blocketData.push(r.blocket.buyerTotal);
+      }
+
+      chartInstance.data.labels = labels;
+      chartInstance.data.datasets[0].data = traderaData;
+      chartInstance.data.datasets[1].data = blocketData;
+      chartInstance.update();
+    }
+
+    // Populate Reference Table
+    function renderBreakEvenTable() {
+      const steps = [10, 50, 100, 200, 500, 1000, 2500, 5000, 7500, 10000];
+      const includeProt = traderaProtToggle.checked;
+      const currentVal = parseFloat(amountInput.value);
+
+      breakEvenTableBody.innerHTML = steps.map(p => {
+        const res = calculateFees(p, includeProt, activeMode);
+        const isSelected = currentVal === p;
+
+        let winnerBadge = '';
+        if (res.winner === 'blocket') {
+          winnerBadge = `<span class="px-2 py-0.5 rounded text-xs font-bold bg-sky-500/20 text-sky-400 border border-sky-500/30">Blocket</span>`;
+        } else if (res.winner === 'tradera') {
+          winnerBadge = `<span class="px-2 py-0.5 rounded text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">Tradera</span>`;
+        } else {
+          winnerBadge = `<span class="px-2 py-0.5 rounded text-xs font-bold bg-slate-800 text-slate-400">Lika</span>`;
+        }
+
+        return `
+          <tr class="${isSelected ? 'bg-sky-500/10 font-bold text-white' : 'hover:bg-slate-950/40 transition-colors'}">
+            <td class="px-4 py-3 font-bold text-slate-200">${p.toLocaleString('sv-SE')} kr</td>
+            <td class="px-4 py-3">${formatSEKShort(res.tradera.listPrice)}</td>
+            <td class="px-4 py-3 font-semibold text-amber-300">${formatSEKShort(res.tradera.buyerTotal)}</td>
+            <td class="px-4 py-3">${formatSEKShort(res.blocket.listPrice)}</td>
+            <td class="px-4 py-3 font-semibold text-sky-300">${formatSEKShort(res.blocket.buyerTotal)}</td>
+            <td class="px-4 py-3">${winnerBadge}</td>
+            <td class="px-4 py-3 text-xs text-slate-400">${formatSEK(res.diff)} skilde</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Event Listeners
+    amountInput.addEventListener('input', (e) => {
+      let val = parseFloat(e.target.value);
+      if (isNaN(val)) val = 10;
+      amountSlider.value = Math.min(val, 10000);
+      updateUI();
+      renderBreakEvenTable();
+    });
+
+    amountSlider.addEventListener('input', (e) => {
+      amountInput.value = e.target.value;
+      updateUI();
+      renderBreakEvenTable();
+    });
+
+    traderaProtToggle.addEventListener('change', () => {
+      updateUI();
+      renderBreakEvenTable();
+    });
+
+    presetButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const val = parseFloat(btn.dataset.val);
+        amountInput.value = val;
+        amountSlider.value = val;
+        updateUI();
+        renderBreakEvenTable();
+      });
+    });
+
+    // Perspective Mode Switches
+    modeSellerBtn.addEventListener('click', () => {
+      activeMode = 'seller';
+      modeSellerBtn.className = 'flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 bg-emerald-500 text-slate-950 shadow-md';
+      modeBuyerBtn.className = 'flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800';
+      updateUI();
+      renderBreakEvenTable();
+    });
+
+    modeBuyerBtn.addEventListener('click', () => {
+      activeMode = 'buyer';
+      modeBuyerBtn.className = 'flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 bg-sky-500 text-slate-950 shadow-md';
+      modeSellerBtn.className = 'flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800';
+      updateUI();
+      renderBreakEvenTable();
+    });
+
+    // Chart View Range Switching
+    chartView1k.addEventListener('click', () => {
+      chartMaxLimit = 1000;
+      chartView1k.className = 'px-3 py-1 rounded-lg bg-sky-500 text-slate-950 font-bold transition-all';
+      chartView10k.className = 'px-3 py-1 rounded-lg bg-slate-800 text-slate-200 transition-all';
+      updateUI();
+    });
+
+    chartView10k.addEventListener('click', () => {
+      chartMaxLimit = 10000;
+      chartView10k.className = 'px-3 py-1 rounded-lg bg-sky-500 text-slate-950 font-bold transition-all';
+      chartView1k.className = 'px-3 py-1 rounded-lg bg-slate-800 text-slate-200 transition-all';
+      updateUI();
+    });
+
+    // On Load
+    window.onload = function() {
+      initChart();
+      updateUI();
+      renderBreakEvenTable();
+    };
+  </script>
+</body>
+</html>
